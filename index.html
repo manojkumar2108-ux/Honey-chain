@@ -1,0 +1,2029 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>HoneyTrace | Blockchain Honey Traceability</title>
+
+<!-- QR CODE LIBRARY -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     MAIN WEBSITE
+===================================================== -->
+
+<div id="mainWebsite">
+
+
+<!-- ================= NAVBAR ================= -->
+
+<nav>
+
+    <div class="logo">
+        🍯 Honey<span>Trace</span>
+    </div>
+
+
+    <ul>
+
+        <li onclick="scrollToSection('home')">
+            Home
+        </li>
+
+        <li onclick="scrollToSection('features')">
+            Features
+        </li>
+
+        <li onclick="scrollToSection('dashboard')">
+            Dashboard
+        </li>
+
+        <li onclick="scrollToSection('trace')">
+            Traceability
+        </li>
+
+    </ul>
+
+
+    <div class="nav-buttons">
+
+        <button
+            class="nav-btn beekeeper-btn"
+            onclick="openLogin('Beekeeper')">
+
+            🐝 Beekeeper
+
+        </button>
+
+
+        <button
+            class="nav-btn login-btn"
+            onclick="openRoleSelection()">
+
+            🔐 Login
+
+        </button>
+
+    </div>
+
+</nav>
+
+
+<!-- ================= HERO ================= -->
+
+<section class="hero" id="home">
+
+    <div class="hero-content">
+
+        <h1>
+
+            Smart
+            <span>Honey</span>
+
+            <br>
+
+            Traceability
+
+        </h1>
+
+
+        <p>
+
+            A blockchain-based system for transparent
+            honey traceability and smart beekeeping
+            management.
+
+            Track every step from beehive to consumer.
+
+        </p>
+
+
+        <div class="hero-buttons">
+
+            <button
+                class="main-btn yellow"
+                onclick="scrollToSection('dashboard')">
+
+                Explore Dashboard
+
+            </button>
+
+
+            <button
+                class="main-btn outline"
+                onclick="scrollToSection('trace')">
+
+                Track Honey
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="honey">
+
+        🍯
+
+    </div>
+
+</section>
+
+
+<!-- ================= FEATURES ================= -->
+
+<section id="features">
+
+    <div class="section-title">
+
+        <h2>
+            Powerful
+            <span>Features</span>
+        </h2>
+
+        <p>
+            Smart technology for the honey supply chain
+        </p>
+
+    </div>
+
+
+    <div class="features">
+
+
+        <div class="feature-card">
+
+            <div class="feature-icon">
+                🐝
+            </div>
+
+            <h3>
+                Smart Beekeeping
+            </h3>
+
+            <p>
+                Manage beehives, production,
+                bee health, temperature and humidity.
+            </p>
+
+        </div>
+
+
+        <div class="feature-card">
+
+            <div class="feature-icon">
+                🔗
+            </div>
+
+            <h3>
+                Blockchain
+            </h3>
+
+            <p>
+                Securely record honey production
+                and traceability information.
+            </p>
+
+        </div>
+
+
+        <div class="feature-card">
+
+            <div class="feature-icon">
+                🧪
+            </div>
+
+            <h3>
+                Quality Testing
+            </h3>
+
+            <p>
+                Store honey quality parameters
+                and verification status.
+            </p>
+
+        </div>
+
+
+        <div class="feature-card">
+
+            <div class="feature-icon">
+                📱
+            </div>
+
+            <h3>
+                QR Traceability
+            </h3>
+
+            <p>
+                Scan a QR code to see the complete
+                journey of the honey.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= DASHBOARD ================= -->
+
+<section class="dashboard" id="dashboard">
+
+    <div class="section-title">
+
+        <h2>
+            Beekeeper
+            <span>Dashboard</span>
+        </h2>
+
+    </div>
+
+
+    <div class="stats">
+
+
+        <div class="stat">
+
+            <p>
+                🐝 Total Hives
+            </p>
+
+            <h2>
+                24
+            </h2>
+
+        </div>
+
+
+        <div class="stat">
+
+            <p>
+                🍯 Honey Produced
+            </p>
+
+            <h2>
+                185 KG
+            </h2>
+
+        </div>
+
+
+        <div class="stat">
+
+            <p>
+                📦 Active Batches
+            </p>
+
+            <h2>
+                12
+            </h2>
+
+        </div>
+
+
+        <div class="stat">
+
+            <p>
+                🧪 Pending Tests
+            </p>
+
+            <h2>
+                03
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    <div class="table-box">
+
+        <table>
+
+            <tr>
+
+                <th>
+                    Batch ID
+                </th>
+
+                <th>
+                    Honey
+                </th>
+
+                <th>
+                    Quantity
+                </th>
+
+                <th>
+                    Status
+                </th>
+
+            </tr><tbody id="batchTableBody"></tbody></table>
+
+    </div>
+
+</section>
+
+
+<!-- ================= TRACEABILITY ================= -->
+
+<section id="trace">
+
+    <div class="section-title">
+
+        <h2>
+            Honey
+            <span>Journey</span>
+        </h2>
+
+        <p>
+            From beehive to consumer
+        </p>
+
+    </div>
+
+
+    <div class="timeline">
+
+
+        <div class="timeline-step">
+
+            <div class="timeline-number">
+                1
+            </div>
+
+            <div class="timeline-content">
+
+                <h3>
+                    🐝 Beehive Registered
+                </h3>
+
+                <small>
+                    Hive ID: HV-1024
+                </small>
+
+                <p>
+                    Erode, Tamil Nadu
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="timeline-step">
+
+            <div class="timeline-number">
+                2
+            </div>
+
+            <div class="timeline-content">
+
+                <h3>
+                    🍯 Honey Harvested
+                </h3>
+
+                <small>
+                    Batch: HNY-2026-001
+                </small>
+
+                <p>
+                    Quantity: 25 KG
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="timeline-step">
+
+            <div class="timeline-number">
+                3
+            </div>
+
+            <div class="timeline-content">
+
+                <h3>
+                    🧪 Quality Tested
+                </h3>
+
+                <small>
+                    Moisture: 17.2%
+                </small>
+
+                <p>
+                    Purity: 98% — Verified
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="timeline-step">
+
+            <div class="timeline-number">
+                4
+            </div>
+
+            <div class="timeline-content">
+
+                <h3>
+                    🔗 Blockchain Registered
+                </h3>
+
+                <small>
+                    Transaction recorded
+                </small>
+
+                <p>
+                    Blockchain verified
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="timeline-step">
+
+            <div class="timeline-number">
+                5
+            </div>
+
+            <div class="timeline-content">
+
+                <h3>
+                    📦 Packaged & Delivered
+                </h3>
+
+                <small>
+                    Final Product
+                </small>
+
+                <p>
+                    Ready for consumer
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= QR GENERATOR ================= -->
+
+<section class="qr-section">
+
+    <div class="section-title">
+
+        <h2>
+            Generate
+            <span>Honey QR</span>
+        </h2>
+
+        <p>
+            Scan this QR to verify the honey batch
+        </p>
+
+    </div>
+
+
+    <div id="qrcode"></div>
+
+
+    <h3>
+        HNY-2026-001
+    </h3>
+
+
+    <p class="qr-info">
+
+
+    </p>
+
+
+    <button
+        class="main-btn yellow"
+        onclick="generateHoneyQR()">
+
+        🔳 Generate QR Code
+
+    </button>
+
+</section>
+
+
+<footer>
+
+    🍯 HoneyTrace © 2026
+
+    <br>
+
+    Blockchain-Based Honey Traceability System
+
+</footer>
+
+
+</div>
+
+
+<!-- =====================================================
+     ROLE SELECTION MODAL
+===================================================== -->
+
+<div class="modal" id="roleModal">
+
+    <div class="modal-box">
+
+        <span
+            class="close"
+            onclick="closeModal('roleModal')">
+
+            ×
+
+        </span>
+
+
+        <div class="modal-title">
+
+            <h2>
+                Choose Login Type
+            </h2>
+
+            <p>
+                Select your account type
+            </p>
+
+        </div>
+
+
+        <div class="role-options">
+
+
+            <div
+                class="role-card"
+                onclick="openLogin('Buyer')">
+
+                <div class="role-icon">
+                    🛒
+                </div>
+
+                <h3>
+                    Buyer
+                </h3>
+
+                <p>
+                    Buy and verify honey
+                </p>
+
+            </div>
+
+
+            <div
+                class="role-card"
+                onclick="openLogin('Seller')">
+
+                <div class="role-icon">
+                    🏪
+                </div>
+
+                <h3>
+                    Seller
+                </h3>
+
+                <p>
+                    Sell and manage honey
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     LOGIN MODAL
+===================================================== -->
+
+<div class="modal" id="loginModal">
+
+    <div class="modal-box">
+
+        <span
+            class="close"
+            onclick="closeModal('loginModal')">
+
+            ×
+
+        </span>
+
+
+        <div class="modal-title">
+
+            <h2>
+
+                <span
+                    class="role-name"
+                    id="loginRole">
+
+                    Buyer
+
+                </span>
+
+                Login
+
+            </h2>
+
+
+            <p>
+                Login to HoneyTrace
+            </p>
+
+        </div>
+
+
+        <form onsubmit="loginUser(event)">
+
+
+            <div class="form-group">
+
+                <label>
+                    Email
+                </label>
+
+                <input
+                    type="text"
+                    id="loginContact"
+                    placeholder="Enter email"
+                    required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="loginPassword"
+                    placeholder="Enter password"
+                    required>
+
+            </div>
+
+
+            <button
+                class="form-submit"
+                type="submit">
+
+                Login
+
+            </button>
+
+        </form>
+
+
+        <div class="switch-text">
+
+            Don't have an account?
+
+            <span onclick="openRegister()">
+                Register
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     REGISTRATION MODAL
+===================================================== -->
+
+<div class="modal" id="registerModal">
+
+    <div class="modal-box">
+
+        <span
+            class="close"
+            onclick="closeModal('registerModal')">
+
+            ×
+
+        </span>
+
+
+        <div class="modal-title">
+
+            <h2>
+
+                <span
+                    class="role-name"
+                    id="registerRole">
+
+                    Buyer
+
+                </span>
+
+                Registration
+
+            </h2>
+
+
+            <p>
+                Create your HoneyTrace account
+            </p>
+
+        </div>
+
+
+        <form onsubmit="registerUser(event)">
+
+
+            <div class="form-group">
+
+                <label>
+                    Full Name
+                </label>
+
+                <input
+                    type="text"
+                    id="registerName"
+                    placeholder="Enter full name"
+                    required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Email
+                </label>
+
+                <input
+                    type="email"
+                    id="registerEmail"
+                    placeholder="Enter email"
+                    required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="registerPassword"
+                    placeholder="Create password"
+                    required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Confirm Password
+                </label>
+
+                <input
+                    type="password"
+                    id="registerConfirmPassword"
+                    placeholder="Confirm password"
+                    required>
+
+            </div>
+
+
+            <button
+                class="form-submit"
+                type="submit">
+
+                Create Account
+
+            </button>
+
+        </form>
+
+
+        <div class="switch-text">
+
+            Already have an account?
+
+            <span onclick="openLogin(currentRole)">
+                Login
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     USER DASHBOARD
+===================================================== -->
+
+<div class="user-dashboard" id="userDashboard">
+
+    <div class="user-header">
+
+        <div>
+
+            <h1 id="dashboardTitle">
+                Dashboard
+            </h1>
+
+            <p id="dashboardWelcome">
+                Welcome to HoneyTrace
+            </p>
+
+        </div>
+
+
+        <button
+            class="logout"
+            onclick="logout()">
+
+            Logout
+
+        </button>
+
+    </div>
+
+
+    <div class="user-grid">
+
+
+        <!-- PROFILE -->
+
+        <div class="user-card">
+
+            <h2>
+                👤 Profile
+            </h2>
+
+            <p>
+                Name: Arun Kumar
+            </p>
+
+            <p>
+                ID: SEL-10027
+            </p>
+
+            <p>
+                Email: arun.honey@example.com
+            </p>
+
+            <p>
+                Phone: +91 98765 43210
+            </p>
+
+        </div>
+
+
+        <!-- HONEY -->
+
+        <div class="user-card">
+
+            <h2>
+                🍯 Honey
+            </h2>
+
+            <p>
+                Organic Forest Honey
+            </p>
+
+            <p>
+                Batch: HNY-2026-001
+            </p>
+
+            <p>
+                Quantity: 25 KG
+            </p>
+
+            <p>
+                Status: ✓ Verified
+            </p>
+
+        </div>
+
+
+        <!-- BLOCKCHAIN -->
+
+        <div class="user-card">
+
+            <h2>
+                🔗 Blockchain
+            </h2>
+
+            <p>
+                Transaction Status:
+                ✓ Recorded
+            </p>
+
+            <p>
+                Hash:
+                0x8f3a9c72bd...
+            </p>
+
+            <p>
+                Network:
+                Demo Blockchain
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- SELLER HONEY ENTRY -->
+
+    <div
+        class="honey-form"
+        id="sellerHoneyForm">
+
+        <h2
+            style="color:#f5c542;margin-bottom:20px;">
+
+            🍯 Add New Honey Batch
+
+        </h2>
+
+
+        <div class="form-group">
+
+            <label>
+                Honey Type
+            </label>
+
+            <select id="honeyType">
+
+                <option>
+                    Organic Forest Honey
+                </option>
+
+                <option>
+                    Wildflower Honey
+                </option>
+
+                <option>
+                    Neem Honey
+                </option>
+
+                <option>
+                    Eucalyptus Honey
+                </option>
+
+                <option>
+                    Multi-floral Honey
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Quantity
+            </label>
+
+            <input
+                type="text"
+                id="honeyQuantity"
+                placeholder="Example: 25 KG">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Harvest Date
+            </label>
+
+            <input
+                type="date"
+                id="harvestDate">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Origin
+            </label>
+
+            <input
+                type="text"
+                id="honeyOrigin"
+                value="Erode, Tamil Nadu">
+
+        </div>
+
+
+        <button
+            class="form-submit"
+            onclick="createHoneyBatch()">
+
+            Generate Honey Batch & QR
+
+        </button>
+
+
+        <div
+            id="sellerQR"
+            style="margin-top:25px;text-align:center;">
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     VERIFICATION PAGE
+===================================================== -->
+
+<div class="verification" id="verificationPage">
+
+    <div class="verify-container">
+
+
+        <div class="verify-header">
+
+            <div class="verify-logo">
+                🍯 HoneyTrace
+            </div>
+
+            <p style="color:#8fa197;">
+                Honey Authenticity & Traceability
+            </p>
+
+
+            <div class="verify-status">
+
+                ✓ Blockchain Verified
+
+            </div>
+
+        </div>
+
+
+        <!-- HONEY -->
+
+        <div class="verify-card">
+
+            <h2>
+                🍯 Honey Details
+            </h2>
+
+
+            <div class="details-grid">
+
+
+                <div class="detail-box">
+
+                    <label>
+                        Honey Type
+                    </label>
+
+                    <strong id="verifyHoneyType">
+                        Organic Forest Honey
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <label>
+                        Batch ID
+                    </label>
+
+                    <strong id="verifyBatch">
+                        HNY-2026-001
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <label>
+                        Quantity
+                    </label>
+
+                    <strong id="verifyQuantity">
+                        25 KG
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <label>
+                        Origin
+                    </label>
+
+                    <strong id="verifyOrigin">
+                        Erode, Tamil Nadu
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <label>
+                        Harvest Date
+                    </label>
+
+                    <strong id="verifyHarvest">
+                        12 September 2026
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <label>
+                        Registered Date
+                    </label>
+
+                    <strong>
+                        13 September 2026
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <label>
+                        Honey Grade
+                    </label>
+
+                    <strong>
+                        Premium Grade A
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <label>
+                        Quality
+                    </label>
+
+                    <strong style="color:#6ee7a0;">
+                        ✓ Verified
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- SELLER -->
+
+        <div class="verify-card">
+
+            <h2>
+                🏪 Seller Details
+            </h2>
+
+
+            <div class="seller-info">
+
+                <div class="seller-avatar">
+                    👨‍🌾
+                </div>
+
+
+                <div>
+
+                    <h3>
+                        Arun Kumar
+                    </h3>
+
+                    <p style="color:#8fa197;">
+                        Seller ID: SEL-10027
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="details-grid">
+
+
+                <div class="detail-box">
+
+                    <label>
+                        Phone
+                    </label>
+
+                    <strong>
+                        +91 98765 43210
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <label>
+                        Email
+                    </label>
+
+                    <strong>
+                        arun.honey@example.com
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <label>
+                        Business
+                    </label>
+
+                    <strong>
+                        Green Hive Honey Farm
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <label>
+                        Location
+                    </label>
+
+                    <strong>
+                        Erode, Tamil Nadu
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- JOURNEY -->
+
+        <div class="verify-card">
+
+            <h2>
+                🔗 Honey Journey
+            </h2>
+
+
+            <div class="timeline">
+
+
+                <div class="timeline-step">
+
+                    <div class="timeline-number">
+                        1
+                    </div>
+
+                    <div class="timeline-content">
+
+                        <h3>
+                            🐝 Beehive Registered
+                        </h3>
+
+                        <p>
+                            Hive ID: HV-1024
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="timeline-step">
+
+                    <div class="timeline-number">
+                        2
+                    </div>
+
+                    <div class="timeline-content">
+
+                        <h3>
+                            🍯 Honey Harvested
+                        </h3>
+
+                        <p>
+                            12 September 2026
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="timeline-step">
+
+                    <div class="timeline-number">
+                        3
+                    </div>
+
+                    <div class="timeline-content">
+
+                        <h3>
+                            🧪 Quality Tested
+                        </h3>
+
+                        <p>
+                            Moisture: 17.2% |
+                            Purity: 98%
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="timeline-step">
+
+                    <div class="timeline-number">
+                        4
+                    </div>
+
+                    <div class="timeline-content">
+
+                        <h3>
+                            🔗 Blockchain Registered
+                        </h3>
+
+                        <p>
+                            13 September 2026
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="timeline-step">
+
+                    <div class="timeline-number">
+                        5
+                    </div>
+
+                    <div class="timeline-content">
+
+                        <h3>
+                            📦 Packaged
+                        </h3>
+
+                        <p>
+                            14 September 2026
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- BLOCKCHAIN -->
+
+        <div class="verify-card">
+
+            <h2>
+                ⛓️ Blockchain Record
+            </h2>
+
+
+            <div class="blockchain-box">
+
+                <p style="color:#81958a;">
+                    Transaction ID
+                </p>
+
+                <p class="hash">
+                    0x8f3a9c72bd4210ab77c91e5d0a31f82
+                </p>
+
+                <br>
+
+                <p style="color:#81958a;">
+                    Status
+                </p>
+
+                <p style="color:#6ee7a0;">
+                    ✓ Permanently Recorded
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <button
+            class="main-btn yellow"
+            onclick="closeVerification()">
+
+            ← Back to HoneyTrace
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+
+if(!window.honeyTraceDB){
+    console.error("HoneyTrace: Supabase client was not initialized.");
+}
+
+/* =====================================================
+   GLOBAL VARIABLES
+===================================================== */
+
+let currentRole = "Buyer";
+
+let batchNumber = 1;
+
+
+/* =====================================================
+   SCROLL
+===================================================== */
+
+function scrollToSection(id){
+
+    document
+        .getElementById(id)
+        .scrollIntoView({
+            behavior:"smooth"
+        });
+
+}
+
+
+/* =====================================================
+   ROLE SELECTION
+===================================================== */
+
+function openRoleSelection(){
+
+    document
+        .getElementById("roleModal")
+        .style.display="flex";
+
+}
+
+
+/* =====================================================
+   LOGIN
+===================================================== */
+
+function openLogin(role){
+
+    currentRole = role;
+
+    closeModal("roleModal");
+
+    document
+        .getElementById("loginRole")
+        .textContent = role;
+
+    document
+        .getElementById("loginModal")
+        .style.display="flex";
+
+}
+
+
+/* =====================================================
+   REGISTER
+===================================================== */
+
+function openRegister(){
+
+    closeModal("loginModal");
+
+    document
+        .getElementById("registerRole")
+        .textContent = currentRole;
+
+    document
+        .getElementById("registerModal")
+        .style.display="flex";
+
+}
+
+
+/* =====================================================
+   CLOSE MODAL
+===================================================== */
+
+function closeModal(id){
+
+    document
+        .getElementById(id)
+        .style.display="none";
+
+}
+
+
+/* =====================================================
+   LOGIN SUBMIT
+===================================================== */
+
+async function loginUser(event){
+
+    event.preventDefault();
+
+    const email =
+        document.getElementById("loginContact").value.trim();
+
+    const password =
+        document.getElementById("loginPassword").value;
+
+    if(!window.honeyTraceDB){
+        alert("Supabase is not connected. Please refresh the page.");
+        return;
+    }
+
+    const { data, error } =
+        await window.honeyTraceDB.auth.signInWithPassword({
+            email,
+            password
+        });
+
+    if(error){
+        alert("Login failed: " + error.message);
+        return;
+    }
+
+    const user = data.user;
+
+    const { data: profile, error: profileError } =
+        await window.honeyTraceDB
+            .from("profiles")
+            .select("full_name, role")
+            .eq("user_id", user.id)
+            .maybeSingle();
+
+    if(profileError){
+        alert("Profile load failed: " + profileError.message);
+        return;
+    }
+
+    const role = profile?.role === "seller" ? "Seller" : "Buyer";
+    const name = profile?.full_name || user.email;
+
+    closeModal("loginModal");
+    showUserDashboard(role, name);
+}
+
+
+/* =====================================================
+   REGISTER
+===================================================== */
+
+async function registerUser(event){
+
+    event.preventDefault();
+
+    const name =
+        document.getElementById("registerName").value.trim();
+
+    const email =
+        document.getElementById("registerEmail").value.trim();
+
+    const password =
+        document.getElementById("registerPassword").value;
+
+    const confirmPassword =
+        document.getElementById("registerConfirmPassword").value;
+
+    if(!name || !email || !password){
+        alert("Please fill all required fields.");
+        return;
+    }
+
+    if(password.length < 6){
+        alert("Password must be at least 6 characters.");
+        return;
+    }
+
+    if(password !== confirmPassword){
+        alert("Passwords do not match.");
+        return;
+    }
+
+    if(!window.honeyTraceDB){
+        alert("Supabase is not connected. Please refresh the page.");
+        return;
+    }
+
+    const role =
+        currentRole === "Seller" ? "seller" : "buyer";
+
+    const { data, error } =
+        await window.honeyTraceDB.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    full_name: name,
+                    role: role
+                }
+            }
+        });
+
+    if(error){
+        alert("Registration failed: " + error.message);
+        return;
+    }
+
+    closeModal("registerModal");
+
+    if(data.session){
+        alert(currentRole + " registration successful!");
+        showUserDashboard(currentRole, name);
+    }else{
+        alert(
+            currentRole +
+            " registration successful! Please check your email to confirm your account."
+        );
+        openLogin(currentRole);
+    }
+}
+
+
+/* =====================================================
+   USER DASHBOARD
+===================================================== */
+
+function showUserDashboard(role,contact){
+
+    document
+        .getElementById("mainWebsite")
+        .style.display="none";
+
+    document
+        .getElementById("userDashboard")
+        .style.display="block";
+
+    document
+        .getElementById("dashboardTitle")
+        .textContent =
+        role + " Dashboard";
+
+    document
+        .getElementById("dashboardWelcome")
+        .textContent =
+        "Welcome to HoneyTrace, " +
+        contact;
+
+
+    /* Seller can add honey */
+
+    if(role === "Seller"){
+
+        document
+        .getElementById("sellerHoneyForm")
+        .style.display="block";
+
+    }
+    else{
+
+        document
+        .getElementById("sellerHoneyForm")
+        .style.display="none";
+
+    }
+
+}
+
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+function logout(){
+
+    document
+        .getElementById("userDashboard")
+        .style.display="none";
+
+    document
+        .getElementById("mainWebsite")
+        .style.display="block";
+
+}
+
+
+/* =====================================================
+   GENERATE MAIN QR
+===================================================== */
+
+function generateHoneyQR(){
+
+    const qrContainer =
+        document.getElementById("qrcode");
+
+    qrContainer.innerHTML="";
+
+
+    /*
+       Demo verification URL
+
+       When hosted, replace this with
+       your real website URL.
+    */
+
+    const verificationURL =
+        window.location.href
+        .split("#")[0]
+        .split("?")[0]
+        + "?verify=HNY-2026-001";
+
+
+    new QRCode(
+
+        qrContainer,
+
+        {
+            text:verificationURL,
+
+            width:200,
+
+            height:200,
+
+            colorDark:"#000000",
+
+            colorLight:"#ffffff",
+
+            correctLevel:
+                QRCode.CorrectLevel.H
+        }
+
+    );
+
+}
+
+
+/* =====================================================
+   SELLER CREATE HONEY
+===================================================== */
+
+function createHoneyBatch(){
+
+    const type =
+        document
+        .getElementById("honeyType")
+        .value;
+
+    const quantity =
+        document
+        .getElementById("honeyQuantity")
+        .value ||
+        "25 KG";
+
+    const harvest =
+        document
+        .getElementById("harvestDate")
+        .value ||
+        "2026-09-12";
+
+    const origin =
+        document
+        .getElementById("honeyOrigin")
+        .value;
+
+
+    const batchID =
+        "HNY-2026-00" +
+        batchNumber;
+
+
+    const qr =
+        document.getElementById("sellerQR");
+
+    qr.innerHTML="";
+
+
+    const qrURL =
+        window.location.href
+        .split("#")[0]
+        .split("?")[0]
+        + "?verify="
+        + batchID;
+
+
+    new QRCode(
+
+        qr,
+
+        {
+            text:qrURL,
+
+            width:200,
+
+            height:200,
+
+            colorDark:"#000000",
+
+            colorLight:"#ffffff",
+
+            correctLevel:
+                QRCode.CorrectLevel.H
+        }
+
+    );
+
+
+    qr.innerHTML +=
+
+        "<h3 style='color:#f5c542;margin-top:15px;'>"
+        + batchID +
+        "</h3>" +
+
+        "<p style='color:#8fa197;margin-top:8px;'>"
+        + type +
+        " | "
+        + quantity +
+        "</p>";
+
+
+    batchNumber++;
+
+}
+
+
+/* =====================================================
+   QR VERIFICATION
+===================================================== */
+
+function checkVerification(){
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    const batch =
+        params.get("verify");
+
+
+    if(batch){
+
+        document
+        .getElementById("mainWebsite")
+        .style.display="none";
+
+        document
+        .getElementById("verificationPage")
+        .style.display="block";
+
+
+        document
+        .getElementById("verifyBatch")
+        .textContent=batch;
+
+    }
+
+}
+
+
+/* =====================================================
+   CLOSE VERIFICATION
+===================================================== */
+
+function closeVerification(){
+
+    document
+    .getElementById("verificationPage")
+    .style.display="none";
+
+    document
+    .getElementById("mainWebsite")
+    .style.display="block";
+
+}
+
+
+/* =====================================================
+   OUTSIDE MODAL CLICK
+===================================================== */
+
+window.onclick=function(event){
+
+    if(
+        event.target.classList
+        .contains("modal")
+    ){
+
+        event.target.style.display="none";
+
+    }
+
+}
+
+
+
+/* =====================================================
+   SUPABASE SESSION RESTORE
+===================================================== */
+
+async function restoreSupabaseSession(){
+
+    if(!window.honeyTraceDB) return;
+
+    const { data: { session } } =
+        await window.honeyTraceDB.auth.getSession();
+
+    if(!session) return;
+
+    const { data: profile } =
+        await window.honeyTraceDB
+            .from("profiles")
+            .select("full_name, role")
+            .eq("user_id", session.user.id)
+            .maybeSingle();
+
+    if(profile){
+        const role =
+            profile.role === "seller" ? "Seller" : "Buyer";
+
+        showUserDashboard(
+            role,
+            profile.full_name || session.user.email
+        );
+    }
+}
+
+/* =====================================================
+   CHECK QR URL
+===================================================== */
+
+checkVerification();
+restoreSupabaseSession();
+
+</script>
+
+</body>
+</html>
+```
