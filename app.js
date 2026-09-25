@@ -1,119 +1,14 @@
 /* =========================================================
-   HoneyTrace - Supabase Application
-   Auth + Email Verification + Profile Creation
+   LOGIN
+   Email / Phone Number
    ========================================================= */
 
-let currentRole = "Buyer";
-let batchNumber = 1;
-
-const db = window.honeyTraceDB;
+let loginContactMode = "email";
 
 
 /* =========================================================
-   HELPERS
+   OPEN LOGIN
    ========================================================= */
-
-function scrollToSection(id) {
-  document.getElementById(id)?.scrollIntoView({
-    behavior: "smooth"
-  });
-}
-
-
-function showError(message) {
-  alert(message);
-}
-
-
-/* =========================================================
-   ROLE NORMALIZATION
-   ========================================================= */
-
-function normalizeRole(role) {
-
-  if (role === "Seller") {
-    return "seller";
-  }
-
-  if (role === "Beekeeper") {
-    return "beekeeper";
-  }
-
-  return "buyer";
-}
-
-
-/* =========================================================
-   FORMAT DATE
-   ========================================================= */
-
-function formatDate(date) {
-
-  if (!date) {
-    return "-";
-  }
-
-  return new Date(date + "T00:00:00").toLocaleDateString(
-    "en-IN",
-    {
-      day: "2-digit",
-      month: "long",
-      year: "numeric"
-    }
-  );
-}
-
-
-/* =========================================================
-   HASH
-   ========================================================= */
-
-async function makeHash(value) {
-
-  const bytes = new TextEncoder().encode(value);
-
-  const hashBuffer = await crypto.subtle.digest(
-    "SHA-256",
-    bytes
-  );
-
-  return Array.from(
-    new Uint8Array(hashBuffer)
-  )
-    .map(b => b.toString(16).padStart(2, "0"))
-    .join("");
-}
-
-
-/* =========================================================
-   GENERATE BATCH ID
-   ========================================================= */
-
-function generateBatchId() {
-
-  const year = new Date().getFullYear();
-
-  const random = Math.floor(
-    1000 + Math.random() * 9000
-  );
-
-  return `HNY-${year}-${random}`;
-}
-
-
-/* =========================================================
-   ROLE / MODAL
-   ========================================================= */
-
-function openRoleSelection() {
-
-  const modal = document.getElementById("roleModal");
-
-  if (modal) {
-    modal.style.display = "flex";
-  }
-}
-
 
 function openLogin(role) {
 
@@ -121,297 +16,521 @@ function openLogin(role) {
 
   closeModal("roleModal");
 
-  const loginRole = document.getElementById("loginRole");
+  const loginRole =
+    document.getElementById("loginRole");
 
   if (loginRole) {
     loginRole.textContent = role;
   }
 
-  const loginModal = document.getElementById("loginModal");
+  const loginModal =
+    document.getElementById("loginModal");
 
   if (loginModal) {
+
     loginModal.style.display = "flex";
-  }
-}
 
+    setupLoginContact();
 
-function openRegister() {
-
-  closeModal("loginModal");
-
-  const registerRole =
-    document.getElementById("registerRole");
-
-  if (registerRole) {
-    registerRole.textContent = currentRole;
-  }
-
-  const registerModal =
-    document.getElementById("registerModal");
-
-  if (registerModal) {
-    registerModal.style.display = "flex";
-  }
-}
-
-
-function closeModal(id) {
-
-  const modal = document.getElementById(id);
-
-  if (modal) {
-    modal.style.display = "none";
+    clearLoginFields();
   }
 }
 
 
 /* =========================================================
-   SUPABASE AUTH
-   REGISTER
+   SETUP EMAIL / PHONE OPTIONS
    ========================================================= */
 
-async function registerUser(event) {
+function setupLoginContact() {
 
-  event.preventDefault();
+  const contactInput =
+    document.getElementById("loginContact");
 
+  if (!contactInput) {
+    return;
+  }
 
-  /* ---------- GET FORM VALUES ---------- */
-
-  const nameElement =
-    document.getElementById("registerName");
-
-  const emailElement =
-    document.getElementById("registerEmail");
-
-  const passwordElement =
-    document.getElementById("registerPassword");
-
-  const confirmPasswordElement =
-    document.getElementById(
-      "registerConfirmPassword"
-    );
-
+  /*
+   * Check whether buttons already exist.
+   * This prevents duplicate buttons.
+   */
 
   if (
-    !nameElement ||
-    !emailElement ||
-    !passwordElement ||
-    !confirmPasswordElement
+    document.getElementById("loginEmailOption") &&
+    document.getElementById("loginPhoneOption")
   ) {
 
-    showError(
-      "Registration form fields are missing."
-    );
+    updateLoginContactUI();
 
     return;
   }
 
 
-  const name =
-    nameElement.value.trim();
+  /*
+   * Create option container
+   */
 
-  const email =
-    emailElement.value.trim();
+  const container =
+    document.createElement("div");
 
-  const password =
-    passwordElement.value;
+  container.id =
+    "loginContactOptions";
 
-  const confirmPassword =
-    confirmPasswordElement.value;
+  container.style.display =
+    "flex";
+
+  container.style.gap =
+    "10px";
+
+  container.style.marginBottom =
+    "12px";
 
 
-  /* ---------- VALIDATION ---------- */
+  /*
+   * Email button
+   */
 
-  if (!name) {
+  const emailButton =
+    document.createElement("button");
 
-    showError(
-      "Please enter your name."
+  emailButton.type =
+    "button";
+
+  emailButton.id =
+    "loginEmailOption";
+
+  emailButton.textContent =
+    "Email";
+
+
+  /*
+   * Phone button
+   */
+
+  const phoneButton =
+    document.createElement("button");
+
+  phoneButton.type =
+    "button";
+
+  phoneButton.id =
+    "loginPhoneOption";
+
+  phoneButton.textContent =
+    "Phone Number";
+
+
+  /*
+   * Common button style
+   */
+
+  [emailButton, phoneButton].forEach(
+    button => {
+
+      button.style.flex =
+        "1";
+
+      button.style.padding =
+        "10px";
+
+      button.style.borderRadius =
+        "8px";
+
+      button.style.border =
+        "1px solid #f5c542";
+
+      button.style.cursor =
+        "pointer";
+
+      button.style.fontWeight =
+        "600";
+
+      button.style.fontSize =
+        "14px";
+
+    }
+  );
+
+
+  /*
+   * Add buttons
+   */
+
+  container.appendChild(
+    emailButton
+  );
+
+  container.appendChild(
+    phoneButton
+  );
+
+
+  /*
+   * Insert buttons before input
+   */
+
+  contactInput.parentElement?.insertBefore(
+    container,
+    contactInput
+  );
+
+
+  /*
+   * Email click
+   */
+
+  emailButton.addEventListener(
+    "click",
+    function () {
+
+      loginContactMode =
+        "email";
+
+      updateLoginContactUI();
+
+      clearLoginContactOnly();
+
+    }
+  );
+
+
+  /*
+   * Phone click
+   */
+
+  phoneButton.addEventListener(
+    "click",
+    function () {
+
+      loginContactMode =
+        "phone";
+
+      updateLoginContactUI();
+
+      clearLoginContactOnly();
+
+    }
+  );
+
+
+  updateLoginContactUI();
+}
+
+
+/* =========================================================
+   UPDATE EMAIL / PHONE UI
+   ========================================================= */
+
+function updateLoginContactUI() {
+
+  const input =
+    document.getElementById(
+      "loginContact"
     );
 
+  const label =
+    document.querySelector(
+      'label[for="loginContact"]'
+    );
+
+  const emailButton =
+    document.getElementById(
+      "loginEmailOption"
+    );
+
+  const phoneButton =
+    document.getElementById(
+      "loginPhoneOption"
+    );
+
+
+  if (!input) {
     return;
   }
 
 
-  if (!email || !email.includes("@")) {
+  /* =====================================================
+     EMAIL MODE
+     ===================================================== */
 
-    showError(
-      "Please enter a valid email address."
-    );
+  if (
+    loginContactMode === "email"
+  ) {
 
-    return;
-  }
+    if (label) {
 
+      label.textContent =
+        "Email";
 
-  if (password.length < 6) {
-
-    showError(
-      "Password must contain at least 6 characters."
-    );
-
-    return;
-  }
-
-
-  if (password !== confirmPassword) {
-
-    showError(
-      "Passwords do not match."
-    );
-
-    return;
-  }
-
-
-  /* ---------- ROLE ---------- */
-
-  const role =
-    normalizeRole(currentRole);
-
-
-  try {
-
-    /* =====================================================
-       CREATE SUPABASE AUTH USER
-
-       IMPORTANT:
-       Database profile is NOT created here.
-
-       Email confirmation must happen first.
-       ===================================================== */
-
-    const { data, error } =
-      await db.auth.signUp({
-
-        email: email,
-
-        password: password,
-
-        options: {
-
-          data: {
-
-            full_name: name,
-
-            role: role
-
-          }
-
-        }
-
-      });
-
-
-    /* ---------- SUPABASE ERROR ---------- */
-
-    if (error) {
-
-      console.error(
-        "Registration error:",
-        error
-      );
-
-      showError(
-        error.message
-      );
-
-      return;
     }
 
 
-    /* ---------- USER CHECK ---------- */
+    input.type =
+      "email";
 
-    if (!data || !data.user) {
+    input.inputMode =
+      "email";
 
-      showError(
-        "Registration failed. User was not created."
-      );
+    input.placeholder =
+      "Enter email";
 
-      return;
+    input.autocomplete =
+      "off";
+
+
+    if (emailButton) {
+
+      emailButton.style.background =
+        "#f5c542";
+
+      emailButton.style.color =
+        "#111";
+
     }
 
 
-    const user = data.user;
+    if (phoneButton) {
 
+      phoneButton.style.background =
+        "transparent";
 
-    /* =====================================================
-       IMPORTANT
+      phoneButton.style.color =
+        "#f5c542";
 
-       DO NOT CREATE profiles HERE.
-
-       Email verification is required first.
-       ===================================================== */
-
-
-    closeModal(
-      "registerModal"
-    );
-
-
-    /* =====================================================
-       IF EMAIL CONFIRMATION IS ENABLED
-
-       data.session will normally be null.
-       ===================================================== */
-
-    if (!data.session) {
-
-      alert(
-        "Registration successful!\n\n" +
-        "Verification email has been sent to:\n" +
-        email +
-        "\n\n" +
-        "Please confirm your email and then login."
-      );
-
-
-      openLogin(
-        currentRole
-      );
-
-
-      return;
     }
-
-
-    /* =====================================================
-       IF EMAIL CONFIRMATION IS DISABLED
-       ===================================================== */
-
-    await createUserProfileAfterLogin(
-      user
-    );
-
-
-    alert(
-      "Registration successful!"
-    );
-
-
-    await showUserDashboard(
-      currentRole,
-      user.email || email
-    );
 
   }
 
 
-  catch (err) {
+  /* =====================================================
+     PHONE MODE
+     ===================================================== */
 
-    console.error(
-      "Unexpected registration error:",
-      err
-    );
+  else {
 
-    showError(
-      "Something went wrong during registration.\n\n" +
-      err.message
-    );
+    if (label) {
+
+      label.textContent =
+        "Phone Number";
+
+    }
+
+
+    input.type =
+      "tel";
+
+    input.inputMode =
+      "tel";
+
+    input.placeholder =
+      "Enter phone number";
+
+    input.autocomplete =
+      "off";
+
+
+    if (phoneButton) {
+
+      phoneButton.style.background =
+        "#f5c542";
+
+      phoneButton.style.color =
+        "#111";
+
+    }
+
+
+    if (emailButton) {
+
+      emailButton.style.background =
+        "transparent";
+
+      emailButton.style.color =
+        "#f5c542";
+
+    }
+
   }
 }
 
 
 /* =========================================================
-   LOGIN
+   CLEAR LOGIN CONTACT
+   ========================================================= */
+
+function clearLoginContactOnly() {
+
+  const input =
+    document.getElementById(
+      "loginContact"
+    );
+
+  if (input) {
+
+    input.value =
+      "";
+
+    input.removeAttribute(
+      "value"
+    );
+
+  }
+}
+
+
+/* =========================================================
+   CLEAR LOGIN FIELDS
+   ========================================================= */
+
+function clearLoginFields() {
+
+  const contactInput =
+    document.getElementById(
+      "loginContact"
+    );
+
+  const passwordInput =
+    document.getElementById(
+      "loginPassword"
+    );
+
+
+  if (contactInput) {
+
+    contactInput.value =
+      "";
+
+    contactInput.setAttribute(
+      "autocomplete",
+      "off"
+    );
+
+    contactInput.removeAttribute(
+      "value"
+    );
+  }
+
+
+  if (passwordInput) {
+
+    passwordInput.value =
+      "";
+
+    passwordInput.setAttribute(
+      "autocomplete",
+      "new-password"
+    );
+
+    passwordInput.removeAttribute(
+      "value"
+    );
+  }
+
+
+  /*
+   * Browser autofill sometimes happens
+   * after JavaScript runs.
+   *
+   * So clear once more after a
+   * short delay.
+   */
+
+  setTimeout(
+    function () {
+
+      if (contactInput) {
+
+        contactInput.value =
+          "";
+
+      }
+
+
+      if (passwordInput) {
+
+        passwordInput.value =
+          "";
+
+      }
+
+    },
+    200
+  );
+}
+
+
+/* =========================================================
+   NORMALIZE INDIAN PHONE NUMBER
+   ========================================================= */
+
+function normalizeIndianPhone(
+  phone
+) {
+
+  let value =
+    phone.replace(
+      /[^\d+]/g,
+      ""
+    );
+
+
+  /*
+   * +919876543210
+   */
+
+  if (
+    value.startsWith("+91")
+  ) {
+
+    value =
+      value.substring(3);
+
+  }
+
+
+  /*
+   * 919876543210
+   */
+
+  else if (
+    value.startsWith("91") &&
+    value.length === 12
+  ) {
+
+    value =
+      value.substring(2);
+
+  }
+
+
+  value =
+    value.replace(
+      /\D/g,
+      ""
+    );
+
+
+  /*
+   * Indian mobile number
+   */
+
+  if (
+    !/^[6-9]\d{9}$/.test(
+      value
+    )
+  ) {
+
+    return null;
+
+  }
+
+
+  return "+91" + value;
+}
+
+
+/* =========================================================
+   LOGIN USER
    ========================================================= */
 
 async function loginUser(event) {
@@ -419,7 +538,11 @@ async function loginUser(event) {
   event.preventDefault();
 
 
-  const emailElement =
+  /* =====================================================
+     GET FORM ELEMENTS
+     ===================================================== */
+
+  const contactElement =
     document.getElementById(
       "loginContact"
     );
@@ -431,7 +554,7 @@ async function loginUser(event) {
 
 
   if (
-    !emailElement ||
+    !contactElement ||
     !passwordElement
   ) {
 
@@ -443,19 +566,23 @@ async function loginUser(event) {
   }
 
 
-  const email =
-    emailElement.value.trim();
+  const contact =
+    contactElement.value.trim();
 
   const password =
     passwordElement.value;
 
 
-  /* ---------- VALIDATION ---------- */
+  /* =====================================================
+     VALIDATION
+     ===================================================== */
 
-  if (!email || !email.includes("@")) {
+  if (!contact) {
 
     showError(
-      "Please enter a valid email address."
+      loginContactMode === "phone"
+        ? "Please enter your phone number."
+        : "Please enter your email address."
     );
 
     return;
@@ -472,43 +599,128 @@ async function loginUser(event) {
   }
 
 
+  /* =====================================================
+     LOGIN
+     ===================================================== */
+
   try {
 
-    /* =====================================================
-       LOGIN
-
-       If email is not confirmed,
-       Supabase will reject the login.
-       ===================================================== */
-
-    const { data, error } =
-      await db.auth.signInWithPassword({
-
-        email: email,
-
-        password: password
-
-      });
+    let loginData;
+    let loginError;
 
 
-    /* ---------- LOGIN ERROR ---------- */
+    /* ===================================================
+       EMAIL LOGIN
+       =================================================== */
 
-    if (error) {
+    if (
+      loginContactMode === "email"
+    ) {
+
+      if (
+        !contact.includes("@")
+      ) {
+
+        showError(
+          "Please enter a valid email address."
+        );
+
+        return;
+      }
+
+
+      const result =
+        await db.auth.signInWithPassword({
+
+          email:
+            contact,
+
+          password:
+            password
+
+        });
+
+
+      loginData =
+        result.data;
+
+      loginError =
+        result.error;
+
+    }
+
+
+    /* ===================================================
+       PHONE LOGIN
+       =================================================== */
+
+    else {
+
+      const phone =
+        normalizeIndianPhone(
+          contact
+        );
+
+
+      if (!phone) {
+
+        showError(
+          "Please enter a valid 10-digit Indian mobile number."
+        );
+
+        return;
+      }
+
+
+      const result =
+        await db.auth.signInWithPassword({
+
+          phone:
+            phone,
+
+          password:
+            password
+
+        });
+
+
+      loginData =
+        result.data;
+
+      loginError =
+        result.error;
+
+    }
+
+
+    /* ===================================================
+       LOGIN ERROR
+       =================================================== */
+
+    if (loginError) {
 
       console.error(
         "Login error:",
-        error
+        loginError
       );
 
+
       showError(
-        error.message
+        loginError.message
       );
 
       return;
     }
 
 
-    if (!data || !data.user) {
+    /* ===================================================
+       USER CHECK
+       =================================================== */
+
+    if (
+      !loginData ||
+      !loginData.user
+    ) {
 
       showError(
         "Login failed."
@@ -519,14 +731,12 @@ async function loginUser(event) {
 
 
     const user =
-      data.user;
+      loginData.user;
 
 
-    /* =====================================================
-       EMAIL CONFIRMED
-
-       NOW create application database records.
-       ===================================================== */
+    /* ===================================================
+       CREATE / UPDATE PROFILE
+       =================================================== */
 
     const profileResult =
       await createUserProfileAfterLogin(
@@ -534,7 +744,9 @@ async function loginUser(event) {
       );
 
 
-    if (!profileResult.success) {
+    if (
+      !profileResult.success
+    ) {
 
       showError(
         profileResult.message
@@ -544,14 +756,18 @@ async function loginUser(event) {
     }
 
 
-    /* ---------- CLOSE LOGIN ---------- */
+    /* ===================================================
+       CLOSE LOGIN MODAL
+       =================================================== */
 
     closeModal(
       "loginModal"
     );
 
 
-    /* ---------- GET ROLE ---------- */
+    /* ===================================================
+       GET ROLE
+       =================================================== */
 
     const role =
       user.user_metadata?.role ||
@@ -562,14 +778,23 @@ async function loginUser(event) {
       "Buyer";
 
 
-    if (role === "seller") {
+    if (
+      role === "seller"
+    ) {
 
-      displayRole = "Seller";
+      displayRole =
+        "Seller";
 
     }
-    else if (role === "beekeeper") {
 
-      displayRole = "Beekeeper";
+
+    else if (
+      role === "beekeeper"
+    ) {
+
+      displayRole =
+        "Beekeeper";
+
     }
 
 
@@ -577,16 +802,31 @@ async function loginUser(event) {
       displayRole;
 
 
-    /* ---------- SUCCESS ---------- */
+    /* ===================================================
+       CLEAR LOGIN DATA
+       =================================================== */
+
+    clearLoginFields();
+
+
+    /* ===================================================
+       SUCCESS
+       =================================================== */
 
     alert(
       "Login successful!"
     );
 
 
+    /* ===================================================
+       SHOW DASHBOARD
+       =================================================== */
+
     await showUserDashboard(
       displayRole,
-      user.email
+      user.email ||
+      user.phone ||
+      contact
     );
 
   }
@@ -599,675 +839,12 @@ async function loginUser(event) {
       err
     );
 
+
     showError(
       "Something went wrong during login.\n\n" +
       err.message
     );
+
   }
+
 }
-
-
-/* =========================================================
-   CREATE PROFILE AFTER SUCCESSFUL LOGIN
-   ========================================================= */
-
-async function createUserProfileAfterLogin(user) {
-
-  try {
-
-    const userId =
-      user.id;
-
-
-    const fullName =
-      user.user_metadata?.full_name ||
-      user.email?.split("@")[0] ||
-      "User";
-
-
-    const role =
-      user.user_metadata?.role ||
-      "buyer";
-
-
-    /* =====================================================
-       CREATE / UPDATE MAIN PROFILE
-       ===================================================== */
-
-    const profileData = {
-
-      user_id: userId,
-
-      full_name: fullName,
-
-      role: role
-
-    };
-
-
-    const {
-      error: profileError
-    } = await db
-      .from("profiles")
-      .upsert(
-        profileData,
-        {
-          onConflict: "user_id"
-        }
-      );
-
-
-    if (profileError) {
-
-      console.error(
-        "Profile creation error:",
-        profileError
-      );
-
-
-      return {
-
-        success: false,
-
-        message:
-          "Login successful, but profile could not be created.\n\n" +
-          profileError.message
-
-      };
-    }
-
-
-    /* =====================================================
-       BEEKEEPER PROFILE
-       ===================================================== */
-
-    if (role === "beekeeper") {
-
-      const beekeeperData = {
-
-        user_id: userId,
-
-        beekeeper_name: fullName,
-
-        apiary_name: "",
-
-        phone: "",
-
-        address: "",
-
-        location: "",
-
-        bee_species: "",
-
-        hive_count: 0
-
-      };
-
-
-      const {
-        error: beekeeperError
-      } = await db
-        .from("beekeeper_profiles")
-        .upsert(
-          beekeeperData,
-          {
-            onConflict: "user_id"
-          }
-        );
-
-
-      if (beekeeperError) {
-
-        console.error(
-          "Beekeeper profile error:",
-          beekeeperError
-        );
-
-
-        return {
-
-          success: false,
-
-          message:
-            "Profile created, but beekeeper profile could not be created.\n\n" +
-            beekeeperError.message
-
-        };
-      }
-    }
-
-
-    /* =====================================================
-       SELLER PROFILE
-       ===================================================== */
-
-    if (role === "seller") {
-
-      const sellerData = {
-
-        user_id: userId,
-
-        seller_name: fullName,
-
-        business_name: "",
-
-        phone: "",
-
-        address: ""
-
-      };
-
-
-      const {
-        error: sellerError
-      } = await db
-        .from("seller_profiles")
-        .upsert(
-          sellerData,
-          {
-            onConflict: "user_id"
-          }
-        );
-
-
-      if (sellerError) {
-
-        console.error(
-          "Seller profile error:",
-          sellerError
-        );
-
-
-        return {
-
-          success: false,
-
-          message:
-            "Profile created, but seller profile could not be created.\n\n" +
-            sellerError.message
-
-        };
-      }
-    }
-
-
-    /* =====================================================
-       SUCCESS
-       ===================================================== */
-
-    return {
-
-      success: true,
-
-      message:
-        "Profile created successfully."
-
-    };
-
-  }
-
-
-  catch (err) {
-
-    console.error(
-      "Profile creation exception:",
-      err
-    );
-
-
-    return {
-
-      success: false,
-
-      message:
-        "Profile creation failed.\n\n" +
-        err.message
-
-    };
-  }
-}
-
-
-/* =========================================================
-   LOGOUT
-   ========================================================= */
-
-async function logoutUser() {
-
-  try {
-
-    const {
-      error
-    } = await db.auth.signOut();
-
-
-    if (error) {
-
-      console.error(
-        "Logout error:",
-        error
-      );
-
-      showError(
-        error.message
-      );
-
-      return;
-    }
-
-
-    currentRole =
-      "Buyer";
-
-
-    alert(
-      "Logged out successfully."
-    );
-
-
-    location.reload();
-
-  }
-
-
-  catch (err) {
-
-    console.error(
-      "Logout exception:",
-      err
-    );
-
-    showError(
-      "Logout failed.\n\n" +
-      err.message
-    );
-  }
-}
-
-
-/* =========================================================
-   GET CURRENT USER
-   ========================================================= */
-
-async function getCurrentUser() {
-
-  try {
-
-    const {
-      data,
-      error
-    } = await db.auth.getUser();
-
-
-    if (error) {
-
-      console.error(
-        "Get user error:",
-        error
-      );
-
-      return null;
-    }
-
-
-    return data.user || null;
-
-  }
-
-
-  catch (err) {
-
-    console.error(
-      "Get current user exception:",
-      err
-    );
-
-    return null;
-  }
-}
-
-
-/* =========================================================
-   DASHBOARD
-   ========================================================= */
-
-async function showUserDashboard(
-  role,
-  contact
-) {
-
-  console.log(
-    "Dashboard:",
-    role,
-    contact
-  );
-
-
-  /* =====================================================
-     SELLER
-     ===================================================== */
-
-  if (role === "Seller") {
-
-    await loadSellerProfile();
-
-    await loadSellerBatches();
-
-  }
-
-
-  /* =====================================================
-     BEEKEEPER
-     ===================================================== */
-
-  if (role === "Beekeeper") {
-
-    await loadBeekeeperProfile();
-
-  }
-
-
-  /* =====================================================
-     BUYER
-     ===================================================== */
-
-  if (role === "Buyer") {
-
-    console.log(
-      "Buyer dashboard loaded."
-    );
-
-  }
-}
-
-
-/* =========================================================
-   LOAD SELLER PROFILE
-   ========================================================= */
-
-async function loadSellerProfile() {
-
-  const user =
-    await getCurrentUser();
-
-
-  if (!user) {
-    return;
-  }
-
-
-  const {
-    data,
-    error
-  } = await db
-    .from("seller_profiles")
-    .select("*")
-    .eq(
-      "user_id",
-      user.id
-    )
-    .maybeSingle();
-
-
-  if (error) {
-
-    console.error(
-      "Seller profile load error:",
-      error
-    );
-
-    return;
-  }
-
-
-  console.log(
-    "Seller Profile:",
-    data
-  );
-}
-
-
-/* =========================================================
-   LOAD BEEKEEPER PROFILE
-   ========================================================= */
-
-async function loadBeekeeperProfile() {
-
-  const user =
-    await getCurrentUser();
-
-
-  if (!user) {
-    return;
-  }
-
-
-  const {
-    data,
-    error
-  } = await db
-    .from("beekeeper_profiles")
-    .select("*")
-    .eq(
-      "user_id",
-      user.id
-    )
-    .maybeSingle();
-
-
-  if (error) {
-
-    console.error(
-      "Beekeeper profile load error:",
-      error
-    );
-
-    return;
-  }
-
-
-  console.log(
-    "Beekeeper Profile:",
-    data
-  );
-}
-
-
-/* =========================================================
-   LOAD SELLER BATCHES
-   ========================================================= */
-
-async function loadSellerBatches() {
-
-  const user =
-    await getCurrentUser();
-
-
-  if (!user) {
-    return;
-  }
-
-
-  const {
-    data,
-    error
-  } = await db
-    .from("honey_batches")
-    .select("*")
-    .eq(
-      "seller_id",
-      user.id
-    );
-
-
-  if (error) {
-
-    console.error(
-      "Honey batches load error:",
-      error
-    );
-
-    return;
-  }
-
-
-  console.log(
-    "Seller Honey Batches:",
-    data
-  );
-}
-
-
-/* =========================================================
-   AUTH SESSION CHECK
-   ========================================================= */
-
-async function checkAuthSession() {
-
-  try {
-
-    const {
-      data,
-      error
-    } = await db.auth.getSession();
-
-
-    if (error) {
-
-      console.error(
-        "Session error:",
-        error
-      );
-
-      return;
-    }
-
-
-    if (
-      data &&
-      data.session &&
-      data.session.user
-    ) {
-
-      const user =
-        data.session.user;
-
-
-      const role =
-        user.user_metadata?.role ||
-        "buyer";
-
-
-      let displayRole =
-        "Buyer";
-
-
-      if (role === "seller") {
-
-        displayRole =
-          "Seller";
-
-      }
-      else if (role === "beekeeper") {
-
-        displayRole =
-          "Beekeeper";
-      }
-
-
-      currentRole =
-        displayRole;
-
-
-      /*
-       * User is already authenticated.
-       * Make sure application profile exists.
-       */
-
-      await createUserProfileAfterLogin(
-        user
-      );
-
-
-      await showUserDashboard(
-        displayRole,
-        user.email
-      );
-    }
-
-  }
-
-
-  catch (err) {
-
-    console.error(
-      "Session check error:",
-      err
-    );
-  }
-}
-
-
-/* =========================================================
-   SUPABASE AUTH STATE CHANGE
-   ========================================================= */
-
-db.auth.onAuthStateChange(
-  async (event, session) => {
-
-    console.log(
-      "Auth event:",
-      event
-    );
-
-
-    if (
-      event === "SIGNED_IN" &&
-      session &&
-      session.user
-    ) {
-
-      const user =
-        session.user;
-
-
-      /*
-       * Profile is created only after
-       * successful authenticated session.
-       */
-
-      await createUserProfileAfterLogin(
-        user
-      );
-    }
-
-
-    if (
-      event === "SIGNED_OUT"
-    ) {
-
-      console.log(
-        "User signed out."
-      );
-    }
-  }
-);
-
-
-/* =========================================================
-   PAGE LOAD
-   ========================================================= */
-
-document.addEventListener(
-  "DOMContentLoaded",
-  async () => {
-
-    console.log(
-      "HoneyTrace application loaded."
-    );
-
-
-    await checkAuthSession();
-
-  }
-);
